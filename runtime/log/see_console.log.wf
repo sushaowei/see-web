@@ -1,4 +1,0 @@
-[20171102 18:50:05 195890][WARNING][logId:150961980519065133][route:][cost:0.01][see/base/ErrorHandler.php:47]Missing argument 1 for app\console\SiteController::actionIndex(),file: /Users/sushaowei/www/source_git/baseApi/console/SiteController.php:8
-[20171102 18:50:05 197107][WARNING][logId:150961980519065133][route:][cost:0.01][see/base/ErrorHandler.php:47]Missing argument 2 for app\console\SiteController::actionIndex(),file: /Users/sushaowei/www/source_git/baseApi/console/SiteController.php:8
-[20171102 18:50:05 197151][WARNING][logId:150961980519065133][route:][cost:0.01][see/base/ErrorHandler.php:47]Undefined variable: a,file: /Users/sushaowei/www/source_git/baseApi/console/SiteController.php:9
-[20171102 18:50:05 197181][WARNING][logId:150961980519065133][route:][cost:0.01][see/base/ErrorHandler.php:47]Undefined variable: b,file: /Users/sushaowei/www/source_git/baseApi/console/SiteController.php:9
