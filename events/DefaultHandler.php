@@ -12,8 +12,8 @@ class DefaultHandler extends \see\base\Object
 		//接管404，重设组件 notFound
 		$app = \See::$app;
 		$app->set('notFound',function($e){
-			echo $e->getMessage();
-			\See::$app->getView()->render("//notFound");
+			// echo $e->getMessage();
+			echo \See::$app->getView()->render("//notFound");
 		});
 	}
 	//checksign
