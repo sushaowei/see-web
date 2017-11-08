@@ -17,6 +17,7 @@ use see;
 abstract class Application extends Module
 {
 
+    public $namespace = "app";
     /**
      * @var string
      */
@@ -28,17 +29,14 @@ abstract class Application extends Module
     public $id;
 
     /**
-     * @var string
+     * @var bool
      */
-    public $name = 'My Application';
-
-
     public $envDev=false;
 
     /**
      * @var string
      */
-    public $version = '1.1';
+    public $version = '2.0';
 
     /**
      * @var string
@@ -66,16 +64,6 @@ abstract class Application extends Module
     public $requestedParams;
 
     /**
-     * @var array
-     */
-    public $bootstrap = [];
-
-    /**
-     * @var array
-     */
-    public $loadedModules = [];
-
-    /**
      * @var
      */
     public $runtimePath;
@@ -85,6 +73,8 @@ abstract class Application extends Module
      */
     public $params=[];
 
+    public static $e = 'e';
+
     /**
      * Application constructor.
      * @param array $config
@@ -92,10 +82,8 @@ abstract class Application extends Module
     public function __construct(array $config=[])
     {
         \See::$app = $this;
-        static::setInstance($this);
         $this->preInit($config);
-        
-        Component::__construct($config);
+        Object::__construct($config);
     }
 
     /**
@@ -116,13 +104,13 @@ abstract class Application extends Module
 
       
         if (isset($config['runtimePath'])) {
-            $this->setRuntimePath($config['runtimePath']);
+            $this->runtimePath = See::getAlias($config['runtimePath']);
             unset($config['runtimePath']);
         } else {
             // set "@runtime"
             $this->runtimePath = $this->getBasePath() . DIRECTORY_SEPARATOR . "runtime";
-            See::setAlias('@runtime', $this->runtimePath);
         }
+        \See::setAlias('@runtime', $this->runtimePath);
         
         if (isset($config['timeZone'])) {
             date_default_timezone_set($config['timeZone']);
@@ -131,9 +119,24 @@ abstract class Application extends Module
             date_default_timezone_set('PRC');
         }
 
+        \See::setAlias('@app', $this->getBasePath());
+
         $this->setComponents($config);
         unset($config['components']);
     }
+
+    /**
+     * @throws ErrorException
+     */
+    public function init(){
+        \See::$log = $this->getLog();
+        $errorHandler = $this->getErrorHandler();
+        $errorHandler->register();
+        //添加app linstener
+        $this->events = array_merge(['default' =>  'see\\event\\DefaultHandler'],$this->events);
+        parent::init();
+    }
+
 
     /**
      * @return array
@@ -170,59 +173,6 @@ abstract class Application extends Module
     }
 
     /**
-     * @throws ErrorException
-     * @throws \ErrorException
-     */
-    protected function bootstrap()
-    {
-        foreach ($this->bootstrap as $class) {
-            $component = null;
-            if (is_string($class)) {
-                if ($this->has($class)) {
-                    $component = $this->get($class);
-                } elseif ($this->hasModule($class)) {
-                    $component = $this->getModule($class);
-                } elseif (strpos($class, '\\') === false) {
-                    throw new ErrorException("Unknown bootstrapping component ID: $class");
-                }
-            }
-            if (!isset($component)) {
-                See::createObject($class);
-            }
-        }
-        
-        
-    }
-
-    /**
-     * @throws ErrorException
-     */
-    public function init(){
-        $this->bootstrap();
-        $errorHandler = $this->getErrorHandler();
-        $errorHandler->register();
-        \See::$log = $this->getLog();
-    }
-
-    /**
-     * @return ErrorHandler
-     * @throws \ErrorException
-     */
-    public function getErrorHandler()
-    {
-        return $this->get('errorHandler');
-    }
-
-    /**
-     * @return mixed|object
-     * @throws \ErrorException
-     */
-    public function getLog()
-    {
-        return $this->get('log');
-    }
-
-    /**
      * @return string
      */
     public function getUniqueId()
@@ -231,30 +181,15 @@ abstract class Application extends Module
     }
 
     /**
-     * @param $path
-     * @throws ErrorException
-     */
-    public function setBasePath($path)
-    {
-        parent::setBasePath($path);
-        \See::setAlias('@app', $this->getBasePath());
-    }
-
-    /**
      * @return int
      * @throws ErrorException
      */
     public function run()
     {
-
-
-        $response = $this->handleRequest($this->getRequest());
-
-
+        $this->handleRequest($this->getRequest());
+        $response = $this->getResponse();
         $response->send();
-
         See::$log->notice('request completed, url:%s', $this->getRequest()->getUrl());
-        
         return $response->exitStatus;
     }
 
@@ -264,14 +199,24 @@ abstract class Application extends Module
      */
     abstract public function handleRequest($request);
 
+    
+   
     /**
-     * @param $path
-     * @throws \Exception
-     */
-    public function setRuntimePath($path)
+    * @return ErrorHandler
+    * @throws \ErrorException
+    */
+    public function getErrorHandler()
     {
-        $this->runtimePath = See::getAlias($path);
-        See::setAlias('@runtime', $this->runtimePath);
+       return $this->get('errorHandler');
+    }
+
+    /**
+    * @return mixed|object
+    * @throws \ErrorException
+    */
+    public function getLog()
+    {
+       return $this->get('log');
     }
 
     /**

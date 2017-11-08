@@ -8,9 +8,9 @@
 
 namespace see\console;
 
-use see\base\Component;
+use see\base\Object;
 
-class Request extends Component
+class Request extends Object
 {
     public function resolve($argv){
         $route = isset($argv[1]) ? $argv[1] : "";

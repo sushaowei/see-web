@@ -11,8 +11,8 @@ $configApp = [
         //数据库设置
         "db"=>[
             'dns'=>'mysql:dbname=see;port=3306;host=localhost;charset=utf8',
-            'user'=>'root',
-            'password'=>'123'
+            'user'=>'dev',
+            'password'=>'chehang168'
         ],
         //模板设置
         "view"=>[
@@ -64,6 +64,17 @@ $configApp = [
             //日志名后缀使用日期
             "suffix"=>'date',
         ],
+    ],
+    'modules'=>[
+        'test'=>[
+            'class'=>'\app\modules\test\Test',
+            'events'=>[
+                'ModulesTestHandler'=>'\app\modules\test\events\ModulesTestHandler',
+            ],
+        ],
+    ],
+    'events'=>[
+        'TestHandler'=>'\app\events\TestHandler',
     ],
 ];
 

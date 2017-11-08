@@ -9,11 +9,11 @@
 namespace see\web;
 
 
-use see\base\Component;
+use see\base\Object;
 use see\exception\ErrorException;
 use see\exception\NotFoundException;
 
-class Response extends Component 
+class Response extends Object 
 {
 
     public $data;

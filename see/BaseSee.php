@@ -40,11 +40,6 @@ class BaseSee
 
     public static $aliases = ['@see' => __DIR__];
 
-    public static $version = '1.0.0-dev';
-    
-    public static $tableDesc = [];
-
-
     /**
      * @param  string $alias 别名名称
      * @param string $path 值
@@ -142,6 +137,7 @@ class BaseSee
      */
     public static function autoload($className)
     {
+        $classFile = false;
         if (isset(static::$classMap[$className])) {
             $classFile = static::$classMap[$className];
             if ($classFile[0] === '@') {
@@ -149,14 +145,11 @@ class BaseSee
             }
         } elseif (strpos($className, '\\') !== false) {
             $classFile = static::getAlias('@' . str_replace('\\', '/', $className) . '.php', false);
-            if ($classFile === false || !is_file($classFile)) {
-//                \See::$app->getLog()->fatal("can't find the class, className:%s, classFile:%s",$className,$classFile);
-                return;
-            }
-        } else {
-            return;
         }
-
+        if ($classFile === false || !is_file($classFile)) {
+            return ;
+        }
+        
         include($classFile);
     }
 
@@ -179,12 +172,4 @@ class BaseSee
        return static::$app->createObject($type, $params);
     }
 
-    public static function descTable($tableName,$db){
-        if(isset(static::$tableDesc[$tableName])){
-            return static::$tableDesc[$tableName];
-        }
-        $sql = "desc ".$tableName;
-        $stat = $db->query($sql);
-        return static::$tableDesc[$tableName] = $stat->fetchAll();
-    }
 }

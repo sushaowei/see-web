@@ -8,13 +8,14 @@
 
 namespace see\base;
 use see\exception\ErrorException;
+use see\event\Event;
 
 /**
  * 模板对象
  * Class View
  * @package see\base
  */
-class View extends Component
+class View extends Object 
 {
     public $params = [];
 
@@ -33,7 +34,7 @@ class View extends Component
             if (\See::$app->controller !== null) {
                 $file = \See::$app->controller->module->getViewPath() . DIRECTORY_SEPARATOR . ltrim($view, '/');
             } else {
-                throw new ErrorException("Unable to resolve view file for view '{$view}' : no active controller");
+                $file = \See::$app->getViewPath() . DIRECTORY_SEPARATOR. ltrim($view, '/');
             }
         }elseif(strpos($view, '/') === false){
             if (\See::$app->controller !== null){
@@ -61,16 +62,22 @@ class View extends Component
      */
     public function render($view,  $params=[],$controller=null){
         $this->controller = $controller;
+        $this->params = array_merge($this->params,$params);
+        //触发beforeAction 事件
+        $event = new Event();
+        $event->sender = $this;
+        Event::trigger($this,'BeforeRender',$event);
+
         $viewFile = $this->findViewFile($view);
+        
         $ext = pathinfo($viewFile, PATHINFO_EXTENSION);
         if (isset($this->renderers[$ext])) {
             if (is_array($this->renderers[$ext]) || is_string($this->renderers[$ext])) {
                 $this->renderers[$ext] = \See::createObject($this->renderers[$ext]);
             }
             $renderer = $this->renderers[$ext];
-            $params = array_merge($this->params,$params);
             /* @var $renderer \see\base\ViewRenderInterface */
-            $output = $renderer->render($this, $viewFile, $params);
+            $output = $renderer->render($this, $viewFile, $this->params);
         } else {
             ob_start();
             ob_implicit_flush(false);

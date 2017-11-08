@@ -39,4 +39,8 @@ class Helper{
         }
         return $return;
     }
+    //escape html
+    public static function escape($text){
+        return htmlspecialchars($text);
+    }
 }

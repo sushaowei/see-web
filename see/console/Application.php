@@ -35,8 +35,13 @@ class Application extends \see\base\Application
     {
         $request = \See::$app->getRequest();
 
-        list($route, $params) = $request->resolve($argv);
-        $this->requestedRoute = $route;
+        $parts = $request->resolve();
+        if($parts === false){
+            throw new NotFoundException("Page not found", 1);
+        }
+        list($route,$params) = $parts;
+        
+        \See::$app->requestedRoute = $route;
         \See::$log->addBasic('route', $route);
         $result = $this->runAction($route, $params);
         if ($request instanceof Response) {

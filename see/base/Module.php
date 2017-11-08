@@ -9,23 +9,37 @@ namespace see\base;
 use see;
 use see\exception\NotFoundException;
 use see\exception\ErrorException;
+use see\interfaces\BootstrapInterface;
 class Module extends ServiceLocation
 {
+    //module id
     protected $id;
     
+    //子模块
     public $modules = [];
+
+    //默认控制器
+    public $defaultRoute = 'site';
     
-    public $defaultRoute = 'default';
     /**
+     * 父模块
      * @var Module
      */
     public $father;
     
+    //框架绝对路径
     private $basePath;
 
+    //模块控制器命名空间
     public $controllerNamespace;
-    
+    //view 路径 
     public $viewPath;
+
+    //当前模块的命名空间
+    public $namespace;
+
+    //监听事件
+    public $events=[];
     
     public function __construct($id,$module,array $config=[])
     {
@@ -34,39 +48,20 @@ class Module extends ServiceLocation
         
         parent::__construct($config);
     }
-    
+    //初始化命令空间
     public function init(){
-        if($this->controllerNamespace === null){
-            $class = get_class($this);
-            if(($pos = strrpos($class,'\\'))!== false){
-                $this->controllerNamespace =  substr($class, 0, $pos) .  '\\controllers';
-            }
+        $class = get_class($this);
+        if( $this->namespace ===null && ($pos = strrpos($class,'\\'))!== false){
+            $this->namespace = substr($class, 0, $pos);
+        }
+        if($this->controllerNamespace === null && $this->namespace !==null ){
+            $this->controllerNamespace =  $this->namespace . '\\controllers';
         }
 
-    }
-    /**
-     * 获取当前的模块对象
-     * @return static|null the currently requested instance of this module class, or null if the module class is not requested.
-     */
-    public static function getInstance()
-    {
-        $class = get_called_class();
-        return isset(See::$app->loadedModules[$class]) ? See::$app->loadedModules[$class] : null;
+        $this->eventHandlerInit();
     }
 
-    /**
-     * 保存当前模块到See::$app的属性中
-     * @param Module|null $instance the currently requested instance of this module class.
-     */
-    public static function setInstance($instance)
-    {
-        if ($instance === null) {
-            unset(See::$app->loadedModules[get_called_class()]);
-        } else {
-            See::$app->loadedModules[get_class($instance)] = $instance;
-        }
-    }
-    
+    //项目绝对路径    
     public function getBasePath(){
         if($this->basePath === null){
             $reflection = new \ReflectionClass($this);
@@ -85,7 +80,7 @@ class Module extends ServiceLocation
             throw new ErrorException("The directory does not exist: $path");
         }
     }
-    
+    //模块id
     public function getUniqueId(){
         return $this->father ? ltrim($this->father->getUniqueId() . '/'. $this->id) : $this->id;
     }
@@ -93,7 +88,7 @@ class Module extends ServiceLocation
     public function getControllerPath(){
         return \See::getAlias('@' . str_replace('\\', '/', $this->controllerNamespace));
     }
-
+    //模板路径
     public function getViewPath()
     {
         if ($this->viewPath === null) {
@@ -101,7 +96,7 @@ class Module extends ServiceLocation
         }
         return $this->viewPath;
     }
-
+    //是否设置了模块
     public function hasModule($id)
     {
         if (($pos = strpos($id, '/')) !== false) {
@@ -113,8 +108,8 @@ class Module extends ServiceLocation
             return isset($this->modules[$id]);
         }
     }
-
-    public function getModule($id, $load = true)
+    //创建模块
+    public function getModule($id)
     {
         if (($pos = strpos($id, '/')) !== false) {
             // sub-module
@@ -126,17 +121,16 @@ class Module extends ServiceLocation
         if (isset($this->modules[$id])) {
             if ($this->modules[$id] instanceof Module) {
                 return $this->modules[$id];
-            } elseif ($load) {
+            } else {
                 /* @var $module Module */
                 $module = See::createObject($this->modules[$id], [$id, $this]);
-                $module->setInstance($module);
                 return $this->modules[$id] = $module;
             }
         }
 
         return null;
     }
-
+    //获取所有模块
     public function getModules($loadedOnly = false)
     {
         if ($loadedOnly) {
@@ -152,9 +146,9 @@ class Module extends ServiceLocation
             return $this->modules;
         }
     }
+    //run
     public function runAction($route, $params = [])
     {
-        \See::$app->requestedRoute = $route;
         $parts = $this->createController($route);
         if (is_array($parts)) {
             /* @var $controller Controller */
@@ -167,7 +161,7 @@ class Module extends ServiceLocation
             throw new NotFoundException('Unable to resolve the request "' . ($id === '' ? $route : $id . '/' . $route) . '".');
         }
     }
-
+    //创建控制器
     public function createController($route)
     {
         if ($route === '') {
@@ -201,9 +195,9 @@ class Module extends ServiceLocation
             $controller = $this->createControllerByID($id . '/' . $route);
             $route = '';
         }
-        return $controller === null ? false : [$controller, $route];
+        return  $controller === null ? false : [$controller, $route];
     }
-
+    //按ID创建控制器
     public function createControllerByID($id)
     {
         $pos = strrpos($id, '/');
@@ -235,4 +229,29 @@ class Module extends ServiceLocation
             throw new ErrorException("Controller class must extend from \\see\\base\\Controller.");
         }
     }
+    //route check
+    public function routeCheck ($route){
+        return $this->createController($route) === false ? false : true;
+    }
+
+    //event eventHandler
+    public function eventHandlerInit(){
+        $moduleDefault = $this->namespace . '\\events\\DefaultHandler';
+        if(class_exists($moduleDefault)){
+            $events = array_merge(['ModuleDefault'=>$moduleDefault],$this->events);
+        }else{
+            $events = $this->events;
+        }
+        foreach($events as $k=>$v){
+            if(!$this->has($k,true)){
+                $eventHandler = $this->createObject($v);
+                $this->set("see_event_".$k,$eventHandler);
+            }
+        }
+    }
+    //get event eventHandler
+    public function getEventHandler($id){
+        return $this->get('see_event_'.$id);
+    }
+
 }

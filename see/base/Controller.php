@@ -13,7 +13,7 @@ use see\exception\NotFoundException;
  * Class Controller
  * @package see\base
  */
-class Controller extends Component
+class Controller extends Object
 {
 
     public $id;
@@ -40,7 +40,7 @@ class Controller extends Component
         $this->module = $module;
         parent::__construct($config);
     }
-
+    //run action
     public function runAction($id, $params = [])
     {
         $action = $this->createAction($id);
@@ -52,12 +52,10 @@ class Controller extends Component
             \See::$app->requestedAction = $action;
         }
         $this->action = $action;
-        $this->beforeAction();
         $result = $action->runWithParams($params);
-        $result = $this->afterAction($result);
         return $result;
     }
-
+    //create action
     public function createAction($id)
     {
         if ($id === '') {
@@ -72,7 +70,7 @@ class Controller extends Component
         }
         return null;
     }
-
+    //获取模板服务
     public function getView()
     {
         if ($this->_view === null) {
@@ -80,7 +78,7 @@ class Controller extends Component
         }
         return $this->_view;
     }
-
+    //获取模板路径
     public function getViewPath()
     {
         if ($this->_viewPath === null) {
@@ -88,7 +86,7 @@ class Controller extends Component
         }
         return $this->_viewPath;
     }
-
+    //设置模板路径
     public function setViewPath($path)
     {
         $this->_viewPath = \See::getAlias($path);
@@ -103,61 +101,14 @@ class Controller extends Component
     {
         return $this->action !== null ? $this->action->getUniqueId() : $this->getUniqueId();
     }
-
-    public function getModules()
-    {
-        $modules = [$this->module];
-        $module = $this->module;
-        while ($module->father !== null) {
-            array_unshift($modules, $module->father);
-            $module = $module->father;
-        }
-        return $modules;
-    }
-
-    public function bindActionParams($action, $params)
-    {
-        $reflection = new \ReflectionMethod($action->controller, $action->actionMethod);
-        $arg = $reflection->getParameters();
-        $result = [];
-        foreach ($arg as $parameter){
-            $name = $parameter->getName();
-            if($parameter->isDefaultValueAvailable()){
-                $value = $parameter->getDefaultValue();
-            }
-            if(isset($params[$name])){
-                $value = $params[$name];
-            }
-            if(!isset($value)){
-                $className = (new \ReflectionClass($action->controller))->getName();
-                throw new NotFoundException("action argv error, controller: $className, action: $action->actionMethod, not set arv: $name", 1);
-            }
-            $result[] = $value;
-        }
-        return $result;
-    }
-
+    
+    //render view
     public function render($view, $params = [])
     {
-        $params = $this->beforeRender($params);
         return $this->getView()->render($view, $params,$this);
     }
-
+    // assign
     public function assign($key,$value){
         $this->getView()->assign($key,$value);
-    }
-
-    protected function beforeAction(){
-
-    }
-
-    protected function afterAction($data){
-        return $data;
-    }
-
-    protected function beforeRender($data){
-        $route = $this->getView()->getUniqueId();
-        $this->getView()->assign('route',$route);
-        return $data;
     }
 }

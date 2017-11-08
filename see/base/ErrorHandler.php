@@ -9,7 +9,7 @@
 namespace see\base;
 use see\exception\ErrorException;
 
-class ErrorHandler extends Component
+class ErrorHandler extends Object
 {
     public function register(){
         if(\See::$app->envDev){
@@ -45,12 +45,10 @@ class ErrorHandler extends Component
             throw new ErrorException($message. ',file: '.$file. ':' . $line);
         }else{
             \See::$log->warning("%s",$message. ',file: '.$file. ':' . $line);
-            if(\See::$log){
-                if(\See::$app->envDev){
-                    echo "<pre>";
-                    echo "[warning]".$message. ',file: '.$file. ':' . $line;
-                    echo "</pre>";
-                }
+            if(\See::$app->envDev){
+                echo "<pre>";
+                echo "[warning]".$message. ',file: '.$file. ':' . $line;
+                echo "</pre>";
             }
         }
     }

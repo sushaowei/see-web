@@ -23,7 +23,11 @@ class SiteController extends Controller
      * @return string
      */
     public function actionIndex(){
-        $data = ['title'=>'首页','text'=>'Hello See!'];
+        $data = ['title'=>'首页','text'=>'Hello!'];
         return $this->render("index", $data);
+    }
+
+    public function actionAbout(){
+    	return "xxx";
     }
 }

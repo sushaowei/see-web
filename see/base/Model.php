@@ -12,7 +12,7 @@ use see\db\query\Query;
 use see\db\query\Select;
 use see\exception\ErrorException;
 
-class Model extends Component
+class Model extends Object
 {
     /**
      * 表字段名
@@ -47,6 +47,8 @@ class Model extends Component
      * @var PdoMysql
      */
     public $db;
+
+    public static $tableDesc = [];
     
     public function init()
     {
@@ -66,7 +68,7 @@ class Model extends Component
      */
     public function ensureTable(){
         if($this->tableName() && empty($this->attributes)){
-            foreach(\See::descTable($this->tableName(),$this->db) as $row){
+            foreach(static::descTable($this->tableName(),$this->db) as $row){
                 if($row['Key'] == 'PRI'){
                     $this->primaryKey = $row['Field'];
                 }
@@ -184,5 +186,15 @@ class Model extends Component
             return $arr[$value];
         }
         return null;
+    }
+
+    //表结构
+    public static function descTable($tableName,$db){
+        if(isset(static::$tableDesc[$tableName])){
+            return static::$tableDesc[$tableName];
+        }
+        $sql = "desc ".$tableName;
+        $stat = $db->query($sql);
+        return static::$tableDesc[$tableName] = $stat->fetchAll();
     }
 }

@@ -9,7 +9,7 @@ namespace see\base;
 
 use see\exception\ErrorException;
 
-class ServiceLocation extends Component
+class ServiceLocation extends Object
 {
     private $components = [];
     
@@ -63,7 +63,8 @@ class ServiceLocation extends Component
             $reflection= new \ReflectionClass($class);
             return $reflection->newInstanceArgs($params);
         }elseif(is_callable($type, true)){
-            return call_user_func_array($type,$params);
+            // return call_user_func_array($type,$params);
+            return $type;
         }elseif(is_array($type)){
             throw new ErrorException("The configuration must contain a 'class' elment");
         }else{

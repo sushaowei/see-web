@@ -2,9 +2,9 @@
 
 namespace see\web;
 
-use see\base\Component;
+use see\base\Object;
 
-class UrlManager extends Component
+class UrlManager extends Object
 {
     public $routeParam = 'r';
 
@@ -15,6 +15,9 @@ class UrlManager extends Component
     public $suffix = "";
 
     public $rule;
+
+    public $defaultController = "site";
+    public $defaultAction = "index";
     /**
      * @param $request Request
      * @return array
@@ -123,4 +126,5 @@ class UrlManager extends Component
         }
         return false;
     }
+
 }

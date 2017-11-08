@@ -7,7 +7,6 @@
  */
 namespace see\db;
 
-use see\base\Component;
 use see\base\Object;
 use see\db\query\Delete;
 use see\db\query\Insert;

@@ -9,7 +9,8 @@
 namespace see\web;
 
 use see\exception\NotFoundException;
-
+use see\exception\EventException;
+use see\event\Event;
 /**
  * Class Application
  * @package see\web
@@ -25,27 +26,49 @@ class Application extends \see\base\Application
      */
     public function handleRequest($request)
     {
+        $response = $this->getResponse();
+        $request = $this->getRequest();
         try {
-            \See::$log->addBasic('clientIp', $request->getRealUserIp());
-            list($route, $params) = $request->resolve();
-            $this->requestedRoute = $route;
-            \See::$log->addBasic('route', $route);
-            \See::$log->trace('trace route:%s', $route);
-            $result = $this->runAction($route, $params);
-            if ($request instanceof Response) {
-                $response = $result;
-            } else {
-                $response = $this->getResponse();
-                $response->data = $result;
+            try {
+                \See::$log->addBasic('clientIp', $request->getRealUserIp());
+
+                $parts = $request->resolve();
+                if($parts === false){
+                    throw new NotFoundException("Page not found", 1);
+                }
+                list($route,$params) = $parts;
+                $this->requestedRoute = $route;
+                $request->setGet($params);
+
+                $event = new Event();
+                $event->sender = $this;
+                Event::trigger($this,'RouteResolved',$event);
+
+                \See::$log->addBasic('route', $this->requestedRoute);
+
+                $result = $this->runAction($route, $params);
+
+                if ($request instanceof Response) {
+                    $response = $result;
+                } else {
+                    $response->data = $result;
+                }
+                \See::$log->addBasic('httpStatus', 200);
+                $response->setStatusCode(200);
+            }catch(EventException $e){
+                $event = new Event();
+                $event->sender = $this;
+                $event->e = $e;
+                Event::trigger($this,'EventException',$event);
             }
-            \See::$log->addBasic('httpStatus', 200);
-            $response->setStatusCode(200);
-            return $response;
         } catch (NotFoundException $e) {
-            $response = $this->getResponse();
-            $response->notFoundSend($e);
-            \See::$log->addBasic('httpStatus', 404);
-            return $response;
+            if(\See::$app->has('notFound')){
+                $notFound = \See::$app->get('notFound');
+                $notFound($e);
+            }else{
+                $response->notFoundSend($e);
+                \See::$log->addBasic('httpStatus', 404);
+            }
         }
 
     }
@@ -67,15 +90,4 @@ class Application extends \see\base\Application
         ]);
     }
 
-    /**
-     * @inheritdoc
-     */
-    protected function bootstrap()
-    {
-        $request = $this->getRequest();
-        \See::setAlias('@webroot', dirname($request->getScriptFile()));
-        \See::setAlias('@web', $request->getBaseUrl());
-
-        parent::bootstrap();
-    }
 }

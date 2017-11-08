@@ -9,24 +9,34 @@
 namespace see\web;
 
 
-use see\base\Component;
+use see\base\Object;
 use see\exception\NotFoundException;
 use see\exception\ErrorException;
 
-class Request extends Component
+class Request extends Object
 {
 
     private $_baseUrl;
+    private $_resolve ;
+
     public function resolve()
     {
-        $result = \See::$app->getUrlManager()->parseRequest($this);
-        if($result){
-            list($route, $params) = $result;
-            $params += $this->getQueryParams();
-            return [$route, $params];
+        if($this->_resolve === null){
+            $result = \See::$app->getUrlManager()->parseRequest($this);
+            if($result){
+                list($route, $params) = $result;
+                $params += $this->getQueryParams();
+                
+                $_resolve = [$route, $params];
+                $this->_resolve = $_resolve;
+                return $_resolve;
+            }else{
+                return false;
+            }
         }else{
-            throw new NotFoundException("Page not found.");
+            return $this->_resolve;
         }
+        
     }
 
     public function getMethod()
@@ -57,20 +67,25 @@ class Request extends Component
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
     }
 
-    public function post($name, $defaultValue = null, $real = false)
+    public function post($name, $defaultValue = null, $callback = '')
     {
-        if($real){
-            $post = $_POST;
-        }else{
-            $post = $this->getPostParams();
+        $post = $this->getPostParams();
+        $result = isset($post[$name]) ? $post[$name] : $defaultValue;
+        if($callback && is_string($callback) && is_callable($callback)){
+            $result = call_user_func_array($callback, [$result]);
         }
-        return isset($post[$name]) ? $post[$name] : $defaultValue;
+        return $result;
     }
 
-    public function get($name, $defaultValue = null)
+    public function get($name, $defaultValue = null, $callback = '')
     {
         $get = $this->getQueryParams();
-        return isset($get[$name]) ? $get[$name] : $defaultValue;
+        $result = isset($get[$name]) ? $get[$name] : $defaultValue;
+        
+        if($callback && is_string($callback) && is_callable($callback)){
+            $result = call_user_func_array($callback, [$result]);
+        }
+        return $result;
     }
 
     public function getQueryParams()
@@ -79,40 +94,7 @@ class Request extends Component
             return [];
         }else{
             $get = $_GET;
-//            array_walk_recursive($get, function(&$value,$key){
-//               $value= addslashes(htmlentities($value));
-//            });
-            $this->SafeFilter($get);
             return $get;
-        }
-    }
-
-    function SafeFilter (&$arr)
-    {
-
-        $ra=Array('/([\x00-\x08,\x0b-\x0c,\x0e-\x19])/','/script/','/javascript/','/vbscript/','/expression/','/applet/','/meta/','/xml/','/blink/','/link/','/style/','/embed/','/object/','/frame/','/layer/','/title/','/bgsound/','/base/','/onload/','/onunload/','/onchange/','/onsubmit/','/onreset/','/onselect/','/onblur/','/onfocus/','/onabort/','/onkeydown/','/onkeypress/','/onkeyup/','/onclick/','/ondblclick/','/onmousedown/','/onmousemove/','/onmouseout/','/onmouseover/','/onmouseup/','/onunload/',
-            "/select\b|insert\b|update\b|delete\b|drop\b|;|\"|\'|\(|\)|\{|\}|\/\*|\*|\.\.\/|\.\/|union|into|load_file|outfile|dump/is",
-            "/(<[^>]*)on[a-zA-Z]+\s*=([^>]*>)/isU",
-            );
-
-        if (is_array($arr))
-        {
-            foreach ($arr as $key => $value)
-            {
-                if (!is_array($value))
-                {
-                    if (!get_magic_quotes_gpc())             //不对magic_quotes_gpc转义过的字符使用addslashes(),避免双重转义。
-                    {
-                        $value  = addslashes($value);           //给单引号（'）、双引号（"）、反斜线（\）与 NUL（NULL 字符）加上反斜线转义
-                    }
-                    $value       = preg_replace($ra,'',$value);     //删除非打印字符，粗暴式过滤xss可疑字符串
-                    $arr[$key]     = htmlentities(strip_tags($value)); //去除 HTML 和 PHP 标记并转换为 HTML 实体
-                }
-                else
-                {
-                    $this->SafeFilter($arr[$key]);
-                }
-            }
         }
     }
 
@@ -122,9 +104,6 @@ class Request extends Component
             return [];
         }else{
             $post= $_POST;
-            array_walk_recursive($post, function(&$value,$key){
-                $value= addslashes($value);
-            });
             return $post;
         }
     }
@@ -261,5 +240,10 @@ class Request extends Component
     
     public function getScriptFile(){
         return $_SERVER['SCRIPT_FILENAME'];
+    }
+
+    public function setGet($value){
+        $_GET = array_merge($_GET, $value);
+        return true;
     }
 }

@@ -9,10 +9,10 @@
 namespace see\console;
 
 
-use see\base\Component;
+use see\base\Object;
 use see\exception\ErrorException;
 
-class Response extends Component 
+class Response extends Object 
 {
     public $data;
     

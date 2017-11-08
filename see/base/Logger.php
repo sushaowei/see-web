@@ -4,7 +4,7 @@ namespace see\base;
  * Class Logger
  * 日志类
  */
-class Logger extends Component
+class Logger extends Object
 {
 
     const L_ALL = 0;
