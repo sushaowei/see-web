@@ -29,6 +29,7 @@ class SiteController extends Controller
 
     public function actionAbout(){
         var_dump(\See::$app->user);
+        echo $this->event,"\n";
     	return "about";
     }
 
