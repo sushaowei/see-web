@@ -115,13 +115,13 @@ class Response extends Object
             }
         }
     }
-    public function send()
+    public function send($data=null)
     {
         if($this->isSend){
             return ;
         }
         $this->sendHeaders();
-        $this->sendContent();
+        $this->sendContent($data);
         $this->isSend = true;
     }
     
@@ -150,8 +150,11 @@ class Response extends Object
         header("HTTP/{$this->version} {$statusCode} {$this->statusText}");
     }
 
-    protected function sendContent()
-    {
+    protected function sendContent($data=null)
+    {   
+        if($data !== null){
+            $this->data = $data;
+        }
         if($this->data === null){
             return ;
         }

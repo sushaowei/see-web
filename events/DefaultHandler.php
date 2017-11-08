@@ -14,7 +14,7 @@ class DefaultHandler extends \see\base\Object
 		$app->set('notFound',function($e){
 			// echo $e->getMessage();
 			// echo \See::$app->getView()->render("//notFound");
-			\See::$app->getResponse()->data = \See::$app->getView()->render("//notFound");
+			\See::$app->getResponse()->send( \See::$app->getView()->render("//notFound") );
 		});
 	}
 	//checksign
