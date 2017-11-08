@@ -12,6 +12,6 @@ class TestHandler extends \see\base\Object
 
 	public function testHandler($event){
 		echo "event test testHandler\n";
-		$event->handled = true;//停止
+		// $event->handled = true;//停止
 	}
 }
