@@ -1,6 +1,7 @@
 <?php
 namespace app\events;
 use see\event\BeforeAction;
+use see\event\BeforeRender;
 class TestHandler extends \see\base\Object
 {
 	public function init(){
@@ -8,6 +9,11 @@ class TestHandler extends \see\base\Object
 			echo "event test \n";
 		});
 		BeforeAction::on("*",[$this,'testHandler'],false);
+		BeforeRender::on(function($event){
+			$view = $event->sender;
+			$view = \See::$app->getView();
+			$view->assign("r","r test");
+		});
 	}
 
 	public function testHandler($event){
