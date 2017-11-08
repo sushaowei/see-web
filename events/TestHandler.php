@@ -5,15 +5,16 @@ use see\event\BeforeRender;
 class TestHandler extends \see\base\Object
 {
 	public function init(){
-		BeforeAction::on(['#^site/\w+$#','#^test/[\w\/]+#','test'],function(){
-			echo "event test \n";
-		});
+		// BeforeAction::on(['#^site/\w+$#','#^test/[\w\/]+#','test'],function(){
+		// 	echo "event test \n";
+		// });
 		BeforeAction::on("*",[$this,'testHandler'],false);
-		BeforeRender::on(function($event){
-			$view = $event->sender;
-			$view = \See::$app->getView();
-			$view->assign("r","r test");
-		});
+		// BeforeRender::on(function($event){
+		// 	$view = $event->sender;
+		// 	$view = \See::$app->getView();
+		// 	$view->assign("r","r test");
+		// 	$params= $view->params;
+		// });
 	}
 
 	public function testHandler($event){
