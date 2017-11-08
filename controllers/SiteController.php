@@ -28,6 +28,10 @@ class SiteController extends Controller
     }
 
     public function actionAbout(){
-    	return "xxx";
+    	return "about";
+    }
+
+    public function actioContent(){
+        return "content";
     }
 }
