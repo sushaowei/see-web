@@ -28,6 +28,7 @@ class SiteController extends Controller
     }
 
     public function actionAbout(){
+        var_dump(\See::$app->user);
     	return "about";
     }
 

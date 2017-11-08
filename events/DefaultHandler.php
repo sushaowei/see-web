@@ -7,7 +7,7 @@ class DefaultHandler extends \see\base\Object
 	public function init(){
 		//监听事件
 		RouteResolved::on([$this,'checkSign']);
-		RouteResolved::on("#^user/#",[$this,'initUser']);
+		RouteResolved::on("site/about",[$this,'initUser']);
 
 		//接管404，重设组件 notFound
 		$app = \See::$app;
