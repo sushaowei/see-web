@@ -229,10 +229,6 @@ class Module extends ServiceLocation
             throw new ErrorException("Controller class must extend from \\see\\base\\Controller.");
         }
     }
-    //route check
-    public function routeCheck ($route){
-        return $this->createController($route) === false ? false : true;
-    }
 
     //event eventHandler
     public function eventHandlerInit(){

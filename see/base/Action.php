@@ -41,6 +41,7 @@ class Action extends Object
         if(\See::$app->requestedParams === null){
             \See::$app->requestedParams = $args;
         }
+        \See::$app->requestedRoute = $this->getUniqueId();
 
         //触发beforeAction 事件
         $event = new Event();

@@ -26,7 +26,8 @@ class TestHandler extends \see\base\Object
 	public function testHandler($event){
 		$app = \See::$app;
 		$app->controller->event='xxx';
-		echo "event test testHandler\n";
+		$route = \See::$app->requestedRoute;
+		echo "{$route} event test testHandler\n";
 		// $event->handled = true;//停止
 	}
 }
