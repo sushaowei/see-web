@@ -34,15 +34,10 @@ class Application extends \see\base\Application
 
                 $parts = $request->resolve();
                 if($parts === false){
-                    throw new NotFoundException("Page not found", 1);
+                    throw new NotFoundException("Page not found", 404);
                 }
                 list($route,$params) = $parts;
                 $this->requestedRoute = $route;
-                $request->setGet($params);
-
-                $event = new Event();
-                $event->sender = $this;
-                Event::trigger($this,'RouteResolved',$event);
 
                 \See::$log->addBasic('route', $this->requestedRoute);
 
