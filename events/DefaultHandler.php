@@ -1,13 +1,13 @@
 <?php
 namespace app\events;
 use see\exception\NotFoundException;
-use see\event\BeforeRender;
+use see\event\BeforeAction;
 class DefaultHandler extends \see\base\Object
 {
 	public function init(){
 		//监听事件
-		BeforeRender::on([$this,'checkSign']);
-		BeforeRender::on(["#^user/#"],[$this,'initUser']);
+		BeforeAction::on([$this,'checkSign']);
+		BeforeAction::on(["#^user/#"],[$this,'initUser']);
 
 		//接管404，重设组件 notFound
 		$app = \See::$app;
