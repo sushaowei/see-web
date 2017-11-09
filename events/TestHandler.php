@@ -2,6 +2,7 @@
 namespace app\events;
 use see\event\BeforeAction;
 use see\event\BeforeRender;
+use see\event\EventException;
 class TestHandler extends \see\base\Object
 {
 	public function init(){
@@ -15,6 +16,11 @@ class TestHandler extends \see\base\Object
 		// 	$view->assign("r","r test");
 		// 	$params= $view->params;
 		// });
+
+
+		EventException::on(function(){
+			echo "event exception\n";
+		});
 	}
 
 	public function testHandler($event){
