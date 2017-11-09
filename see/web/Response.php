@@ -115,6 +115,11 @@ class Response extends Object
             }
         }
     }
+    //set send data
+    public function setData($data){
+        $this->data = $data;
+    }
+
     public function send($data=null)
     {
         if($this->isSend){
