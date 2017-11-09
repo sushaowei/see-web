@@ -1,7 +1,7 @@
 <?php
 namespace app\modules\test\events;
 use see\event\BeforeAction;
-
+use see\exception\EventException;
 class ModulesTestHandler extends \see\base\Object
 {
 	public function init(){
@@ -13,6 +13,7 @@ class ModulesTestHandler extends \see\base\Object
 
 	public function sign($event){
 		echo "event sign\n";
+		throw new EventException("Error EventException Request", 1);
 		
 	}
 }
