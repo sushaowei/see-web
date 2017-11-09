@@ -133,8 +133,6 @@ abstract class Application extends Module
         \See::$log = $this->getLog();
         $errorHandler = $this->getErrorHandler();
         $errorHandler->register();
-        //添加app linstener
-        $this->events = array_merge(['default' =>  'see\\event\\DefaultHandler'],$this->events);
         parent::init();
     }
 

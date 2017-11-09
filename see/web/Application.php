@@ -53,7 +53,6 @@ class Application extends \see\base\Application
                 } else {
                     $response->data = $result;
                 }
-                \See::$log->addBasic('httpStatus', 200);
                 $response->setStatusCode(200);
             }catch(EventException $e){
                 $event = new Event();
@@ -62,12 +61,21 @@ class Application extends \see\base\Application
                 Event::trigger($this,'EventException',$event);
             }
         } catch (NotFoundException $e) {
-            if(\See::$app->has('notFound')){
-                $notFound = \See::$app->get('notFound');
-                $notFound($e);
-            }else{
-                $response->notFoundSend($e);
-                \See::$log->addBasic('httpStatus', 404);
+            $code = $e->getCode();
+            $response = \See::$app->getResponse();
+            switch ($code) {
+                case '301'://重定向
+                    $response->setStatusCode(301);
+                    break;
+                default:
+                    $response->setStatusCode(404);
+                    if(\See::$app->has('notFound')){
+                        $notFound = \See::$app->get('notFound');
+                        $notFound($e);
+                    }else{
+                        $response->notFoundSend($e);
+                    }
+                    break;
             }
         }
 

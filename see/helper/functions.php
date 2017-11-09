@@ -2,5 +2,5 @@
 //重定向
 function redirect($url){
 	header("Location:{$url}");
-	throw new \see\exception\EventException("redirect", 301);
+	throw new \see\exception\NotFoundException("redirect", 301);
 }

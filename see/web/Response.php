@@ -16,7 +16,7 @@ use see\exception\NotFoundException;
 class Response extends Object 
 {
 
-    public $data;
+    public $data="";
     
     public $charset;
     
