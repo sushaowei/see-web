@@ -120,6 +120,7 @@ abstract class Application extends Module
         }
 
         \See::setAlias('@app', $this->getBasePath());
+        \See::setAlias('@view', '@app/views');
 
         $this->setComponents($config);
         unset($config['components']);

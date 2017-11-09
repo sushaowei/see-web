@@ -45,7 +45,7 @@ class Controller extends Object
     {
         $action = $this->createAction($id);
         if ($action === null) {
-            throw new NotFoundException('Unable to resolve the request: ' . $this->getUniqueId() . DIRECTORY_SEPARATOR . $id);
+            throw new NotFoundException('Action error, Unable to resolve the request: ' . $this->getUniqueId() . DIRECTORY_SEPARATOR . $id);
         }
 
         if (\See::$app->requestedAction === null) {

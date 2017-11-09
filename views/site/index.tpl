@@ -10,6 +10,5 @@
 <body>
 
 <h1>{{$text}}</h1>
-<h2>{{$r}}</h2>
 </body>
 </html>
