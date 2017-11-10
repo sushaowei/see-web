@@ -1,0 +1,13 @@
+{
+    "name": "sushaowei/see-web",
+    "description": "a php framework",
+    "authors": [
+        {
+            "name": "sus666",
+            "email": "sus666@126.com"
+        }
+    ],
+    "require": {
+        "sushaowei/see": "1.0.0"
+    }
+}
