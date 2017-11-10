@@ -36,4 +36,12 @@ class SiteController extends Controller
     public function actioContent(){
         return "content";
     }
+
+    public function actionCachetest(){
+        $fileCache = \See::$app->getFileCache();
+        $fileCache->setValue("test","test content");
+
+        $value = $fileCache->getValue('test');
+        return $value;
+    }
 }
