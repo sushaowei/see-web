@@ -19,7 +19,7 @@ $configApp = [
             //使用smarty
             "renderers"=>[
                 "tpl"=>[
-                    'class'=>'\see\smarty\ViewRender',
+                    'class'=>'\see\web\ViewRender',
                     "options"=>[
                         'left_delimiter'=>"{{",
                         "right_delimiter"=>"}}",
