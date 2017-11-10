@@ -11,8 +11,8 @@ $configApp = [
         //数据库设置
         "db"=>[
             'dns'=>'mysql:dbname=see;port=3306;host=localhost;charset=utf8',
-            'user'=>'dev',
-            'password'=>'chehang168'
+            'user'=>'test',
+            'password'=>'test'
         ],
         //模板设置
         "view"=>[
@@ -52,7 +52,7 @@ $configApp = [
                 ["127.0.0.1", "11211", 100],
             ],
             //缓存key前缀, 默认无
-            "prefix"=>"cheoo_v1_",
+            "prefix"=>"see_",
             //memcache option
             "options"=>[
 //                \Memcached::OPT_COMPRESSION=>false,
@@ -79,17 +79,11 @@ $configApp = [
 ];
 
 //引入外界配置
-$configLocal = "/168_root/code_cheoo/wwwConfig/csl_api.php";
+$configLocal = "xxxx";
 if( file_exists($configLocal)){
     $local = require ($configLocal);
-    if(!empty($local['front_db'])){
-        $configApp['components']['db'] = $local['front_db'];
-    }
-    if(!empty($local['front_cache'])){
-        $configApp['components']['cache'] = $local['front_cache'];
-    }
-    if(!empty($local['front_log'])){
-        $configApp['components']['log'] = $local['front_log'];
+    if(!empty($local['components'])){
+        $configApp['components'] = array_merge($local['components']);
     }
     if(isset($local['envDev'])){
         $configApp['envDev'] = $local['envDev'];
