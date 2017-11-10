@@ -8,7 +8,6 @@
 define('ROOT',dirname(__DIR__));
 
 require __DIR__ . '/../vendor/autoload.php';
-
 $config = require('../config/main.php');
 
 $app = new \see\web\Application($config);
