@@ -8,6 +8,6 @@
         }
     ],
     "require": {
-        "sushaowei/see": "1.0.0"
+        "sushaowei/see": "1.0.2"
     }
 }
