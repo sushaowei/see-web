@@ -1,5 +1,6 @@
 <?php
 namespace app\events;
+use see\event\RunAction;
 use see\exception\NotFoundException;
 use see\event\BeforeAction;
 class DefaultHandler extends \see\base\Object
@@ -16,6 +17,9 @@ class DefaultHandler extends \see\base\Object
 		// 	// echo \See::$app->getView()->render("//notFound");
 		// 	\See::$app->getResponse()->setData( \See::$app->getView()->render("//notFound") );
 		// });
+//        RunAction::on_(['site/about'],function(){
+//            echo "runacton";
+//        });
 	}
 	// //checksign
 	// public function checkSign(){
