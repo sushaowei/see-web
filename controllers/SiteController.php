@@ -16,14 +16,16 @@ use see\web\Controller;
  * @package app\controllers
  */
 class SiteController extends Controller
-{
+{   
 
     /**
      * 首页
      * @return string
      */
     public function actionIndex(){
-        $data = ['title'=>'首页','text'=>'Hello!'];
+        $data = ['title'=>'首页','text'=>'Hello!1'];
+        echo $this->request->get("e","",'xss_clean');
+        $test = new Test();
         return $this->render("index", $data);
     }
 
@@ -33,7 +35,14 @@ class SiteController extends Controller
     	return "about";
     }
 
-    public function actioContent(){
+    public function actionContent(){
+        $t = new Test();
+        $t->fun = function(){
+            echo $this->name;
+            echo "xxxxx";
+        };
+        $fun = $t->fun;
+        $fun();
         return "content";
     }
 
@@ -45,3 +54,8 @@ class SiteController extends Controller
         // return $value;
     }
 }
+
+class Test{
+    public $name = 'test';
+}
+

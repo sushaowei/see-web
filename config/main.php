@@ -6,6 +6,7 @@ $configApp = [
     'basePath' => dirname(__DIR__),
     //默认false, 设置是否开发环境
     'envDev'=>true,
+    'debug'=>true,
     //组件， 选设
     "components"=>[
         //数据库设置
