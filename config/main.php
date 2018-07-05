@@ -78,15 +78,20 @@ $configApp = [
     ],
 ];
 
-//引入外界配置
-$configLocal = "xxxx";
-if( file_exists($configLocal)){
-    $local = require ($configLocal);
-    if(!empty($local['components'])){
-        $configApp['components'] = array_merge($local['components']);
-    }
-    if(isset($local['envDev'])){
-        $configApp['envDev'] = $local['envDev'];
-    }
+if (isset($_SERVER['CONF_FILE']) && file_exists($_SERVER['CONF_FILE'])) {
+    //引入外界配置
+    \Conf::initConf($_SERVER['CONF_FILE']);
+    $configApp["components"]['db'] = \Conf::get("db168", "global", $_SERVER['ENV']);
+    $configApp["components"]['dbmc'] = \Conf::get("dbmc", "global", $_SERVER['ENV']);
+    $configApp["components"]['log'] = \Conf::get("logTrace", "global", $_SERVER['ENV']);
+
+    // $configApp["components"]['log']['level'] = \Conf::get("log_level", "saas", $_SERVER['ENV']);
+    // $configApp["components"]['cache'] = \Conf::get("memcache", "saas", $_SERVER['ENV']);
+    // $configApp['envDev'] = \Conf::get("envDev", "saas", $_SERVER['ENV']);
+    // $configApp['debug'] = \Conf::get("debug", "saas", $_SERVER['ENV']);
+
+    defined('IMG_URL_MC') or define('IMG_URL', \Conf::get("IMG_URL_MC", "global", $_SERVER['ENV']));   //图片访问url
+    defined('IMG_URL_168') or define('STATIC_IMG_URL', \Conf::get("IMG_URL_168", "global", $_SERVER['ENV']));   //图片访问url
+    defined('BASE_API') or define('BASE_API_HOST', \Conf::get("BASE_API", "global", $_SERVER['ENV']));   //baseapi
 }
 return $configApp;
